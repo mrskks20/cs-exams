@@ -339,8 +339,18 @@ function backToMenu() {
   scrollToTop();
 }
 
+const secureShuffle = (array) => {
+  for (let i = array.length - 1; i > 0; i--) {
+    const randomBuffer = new Uint32Array(1);
+    window.crypto.getRandomValues(randomBuffer);
+    const j = randomBuffer[0] % (i + 1);
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+};
+
 function selectRandomQuestions(count) {
-  const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
+  const shuffled = secureShuffle([...allQuestions]);
   currentQuestions = shuffled.slice(0, Math.min(count, allQuestions.length));
 }
 
@@ -385,7 +395,9 @@ function shuffleAndMapQuestions(questions) {
     const indices = q.options.map((_, i) => i);
 
     for (let i = indices.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
+      const randomBuffer = new Uint32Array(1);
+      window.crypto.getRandomValues(randomBuffer);
+      const j = randomBuffer[0] % (i + 1);
       [indices[i], indices[j]] = [indices[j], indices[i]];
     }
 
