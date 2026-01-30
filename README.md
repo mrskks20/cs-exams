@@ -1,53 +1,70 @@
 # Jak kontrybuować
 
-Zachęcamy wszystkich studentów do współpracy! Aby zachować porządek w repozytorium i dbać o poprawność pytań, prosimy o przestrzeganie poniższych wytycznych.
+Zachęcamy wszystkich studentów do współpracy! To projekt społecznościowy, ale żeby zachować porządek i uczyć się dobrych praktyk, wprowadzamy zasadę **Code First**.
 
-## 1. Dodawanie nowych pytań
-Pytania są przechowywane w folderze `data/` jako pliki JSON. Możesz edytować istniejące pliki lub proponować nowe.
+## Ważne: No Issues Policy
 
-### Format JSON
-Każde pytanie musi mieć dokładnie taką strukturę:
+**Nie przyjmujemy zgłoszeń błędów w formie "tekstowej" przez zakładkę Issues.**
+Jeśli widzisz błąd w pytaniu lub odpowiedzi:
+
+1. Nie pisz: "W pytaniu X jest błąd".
+2. **Popraw go** w pliku JSON i wyślij **Pull Request (PR)**.
+
+Zakładka *Issues* służy wyłącznie do dyskusji nad architekturą aplikacji lub propozycjami dużych, nowych funkcjonalności. Literówki i błędy w danych naprawiamy kodem.
+
+---
+
+## 1. Jak dodać lub poprawić pytania (Krok po kroku)
+
+1. **Zrób Fork repozytorium** (kliknij przycisk "Fork" w prawym górnym rogu).
+2. **Sklonuj swój fork** na komputer.
+3. **Utwórz Branch** dla swoich zmian. Nazywaj branche opisowo:
+    - `fix/poprawa-odpowiedzi-kcm`
+    - `feat/nowe-pytania-si`
+4. **Edytuj pliki** (szczegóły formatu poniżej).
+5. **Przetestuj zmiany**: Otwórz plik `index.html` w przeglądarce i sprawdź, czy quiz działa i nie wyrzuca błędów w konsoli.
+6. **Wyślij Pull Request** do głównego repozytorium (do brancha `main`).
+
+## 2. Format danych (JSON)
+
+Pytania znajdują się w folderze `data/`. Każde pytanie musi zachować **poprawny format JSON**.
+
+### Struktura pojedynczego pytania
+
 ```json
 {
-  "question": "Treść pytania tutaj?",
+  "question": "Treść pytania?",
   "options": [
     "Odpowiedź A",
     "Odpowiedź B",
     "Odpowiedź C",
     "Odpowiedź D"
   ],
-  "correct": [0, 2] // Indeksy poprawnych odpowiedzi (liczone od 0)
+  "correct": [0, 2]
 }
 ```
 
-### Krok po kroku
-1.  **Zrób fork repozytorium** na GitHubie.
-2.  **Utwórz branch** dla swoich zmian (np. `fix/poprawa-literowki` lub `feat/nowe-pytania-kcm`).
-3.  **Edytuj pliki JSON** w folderze `data/`.
-    *   Jeśli dodajesz nowy plik, dodaj go do odpowiedniego semestru w `config.json`. Struktura pliku wygląda następująco:
-        ```json
-        {
-          "semesters": [
-            {
-              "title": "Nazwa Semestru",
-              "files": [
-                {
-                  "name": "Nazwa Przedmiotu",
-                  "file": "data/nazwa_pliku.json",
-                  "description": "Opis"
-                }
-              ]
-            }
-          ]
-        }
-        ```
-4.  **Przetestuj swoje zmiany**, otwierając `index.html` w przeglądarce.
-5.  **Zgłoś Pull Request (PR)**.
+- **correct**: Tablica z indeksami poprawnych odpowiedzi (liczone od 0).
+- **Uwaga na przecinki!** Pamiętaj, że ostatni element w tablicy lub obiekcie JSON nie może mieć przecinka na końcu.
 
-## 2. Zgłaszanie błędów
-*   Jeśli znajdziesz błędną odpowiedź, otwórz Issue lub zgłoś PR z poprawką.
-*   "Griefing" lub wandalizm (celowe psucie danych) skutkować będzie natychmiastowym banem/blokadą.
+### Dodawanie nowego przedmiotu/pliku
 
-## 3. Zasady
-*   Bądź uprzejmy.
-*   Zamieszczaj tylko treści związane z egzaminami uniwersyteckimi.
+Jeśli tworzysz zupełnie nowy plik (np. `data/nowy_przedmiot.json`), musisz go zarejestrować w pliku `config.json`.
+
+```json
+{
+  "name": "Nazwa Przedmiotu",
+  "file": "data/nowy_przedmiot.json",
+  "description": "Krótki opis, np. rok 2026"
+}
+```
+
+## 3. Zasady akceptacji PR
+
+Twój Pull Request zostanie zaakceptowany, jeśli:
+
+- Format JSON jest poprawny (zwaliduj go przed wysłaniem, np. na [jsonlint.com](https://jsonlint.com)).
+- Dotyczy materiału z egzaminów uniwersyteckich.
+- Nie zawiera treści obraźliwych ani spamu.
+
+> "Griefing" lub celowe wprowadzanie błędnych danych skutkować będzie blokadą możliwości kontrybucji.
