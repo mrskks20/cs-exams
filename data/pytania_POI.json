@@ -1131,16 +1131,6 @@
     "correct": [0]
   },
   {
-    "question": "Dlaczego dostawcy oprogramowania klientom, którzy pobierają oprogramowanie z Internetu publikują wartości skrótu obliczonej np. za pomocą kryptograficznej funkcji skrótu SHA-3?",
-    "options": [
-      "odbiorcy mogą zażądać przyszłych aktualizacji oprogramowania, używając przypisanej wartości skrótu",
-      "odbiorcy mogą potwierdzić autentyczność strony, z której pobierają oprogramowanie",
-      "odbiorcy potrzebują wartości skrótu, aby pomyślnie aktywować nowe oprogramowanie",
-      "odbiorcy mogą sprawdzić integralność oprogramowania po pobraniu"
-    ],
-    "correct": [3]
-  },
-  {
     "question": "Która z poniższych cech NIE jest cechą kryptograficznej funkcji skrótu $h(m)$, gdzie m oznacza wiadomość, dla której obliczany jest skrót za pomocą funkcji h?",
     "options": [
       "$h(m)$ jest funkcją jednokierunkową.",
