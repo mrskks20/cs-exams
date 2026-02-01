@@ -133,6 +133,59 @@ p, small { color: var(--color-text-secondary); }
   color: var(--color-incorrect-text);
 }
 
+.study-marker {
+  margin-right: 12px;
+}
+
+.study-marker.correct {
+  color: var(--color-correct-text);
+  font-weight: bold;
+}
+
+.study-marker.neutral {
+  color: var(--color-text-tertiary);
+}
+
+.progress-bar-container {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+.progress-dot {
+  font-size: 1.2em;
+  line-height: 1;
+}
+
+.progress-dot.filled {
+  color: var(--color-correct-text);
+}
+
+.progress-dot.empty {
+  color: var(--color-element-bg);
+}
+
+.progress-badge {
+  font-size: 0.8em;
+  color: var(--color-primary);
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.mastery-message {
+  margin-top: 15px;
+  color: var(--color-primary);
+}
+
+.score h2 {
+  font-size: 2rem;
+}
+
+.score-percentage {
+  font-size: 2.5rem;
+  margin: 10px 0;
+}
+
 .file-card, .mode-btn, .quiz-info, .question, .score, .controls {
   background: var(--color-card-bg);
   border: 1px solid #333;

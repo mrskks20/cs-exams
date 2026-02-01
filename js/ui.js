@@ -60,10 +60,10 @@ export function renderStudyMode(questions, currentFilename) {
         
         if (isCorrect) {
             className += " correct";
-            marker = `<span style="color: var(--color-correct-text); margin-right: 12px; font-weight: bold;">✓</span>`;
+            marker = `<span class="study-marker correct">✓</span>`;
         } else {
             className += " incorrect2";
-            marker = `<span style="color: var(--color-text-tertiary); margin-right: 12px;">•</span>`; 
+            marker = `<span class="study-marker neutral">•</span>`;
         }
 
         return `<div class="${className}">${marker}${escapeHtml(option)}</div>`;
@@ -74,7 +74,7 @@ export function renderStudyMode(questions, currentFilename) {
     const progressBar = renderProgressBar(streak);
 
     questionDiv.innerHTML = `
-            <h4><span style="display:inline-block; margin-right: 10px;">${progressBar}</span>${index + 1}. ${escapeHtml(q.question)}</h4>
+            <h4><span class="progress-bar-container">${progressBar}</span>${index + 1}. ${escapeHtml(q.question)}</h4>
 
             <div class="study-answers">
                 ${optionsHtml}
@@ -145,14 +145,14 @@ export function renderProgressBar(streak) {
   let html = '';
   for (let i = 0; i < maxStreak; i++) {
     if (i < effectiveStreak) {
-      html += '<span style="color: var(--color-correct-text); font-size: 1.2em; line-height: 1;">•</span>';
+      html += '<span class="progress-dot filled">•</span>';
     } else {
-      html += '<span style="color: var(--color-element-bg); font-size: 1.2em; line-height: 1;">•</span>';
+      html += '<span class="progress-dot empty">•</span>';
     }
   }
   
   if (streak >= 3) {
-      html += ' <span style="font-size: 0.8em; color: var(--color-primary); font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">[Nauczone]</span>';
+      html += ' <span class="progress-badge">[Nauczone]</span>';
   }
   
   return html;
@@ -161,13 +161,13 @@ export function renderProgressBar(streak) {
 export function showResults(correctQuestions, totalQuestions, percentage, grade, gradeColor, encouragement, newlyLearnedCount) {
   let masteryMsg = "";
   if (newlyLearnedCount > 0) {
-    masteryMsg = `<p style="margin-top: 15px; color: var(--color-primary);">+${newlyLearnedCount} nowych pytań opanowanych!</p>`;
+    masteryMsg = `<p class="mastery-message">+${newlyLearnedCount} nowych pytań opanowanych!</p>`;
   }
 
   document.getElementById("results").innerHTML = `
         <div class="score">
-            <h2 style="color: ${gradeColor}; font-size: 2rem;">${grade}</h2>
-            <p style="font-size: 2.5rem; margin: 10px 0;"><strong>${correctQuestions}/${totalQuestions} (${percentage}%)</strong></p>
+            <h2 style="color: ${gradeColor};">${grade}</h2>
+            <p class="score-percentage"><strong>${correctQuestions}/${totalQuestions} (${percentage}%)</strong></p>
             <p>${encouragement}</p>
             ${masteryMsg}
         </div>`;
