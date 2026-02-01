@@ -93,11 +93,7 @@ function prepareQuiz() {
   document.getElementById("controls").style.display = "flex";
   document.getElementById("drawNextBtn").style.display = "none";
   
-  if (currentMode === "study") {
-    UI.renderStudyMode(currentQuestions, currentFile.file);
-  } else {
-    UI.renderQuizMode(currentQuestions);
-  }
+
   
   document.getElementById("checkBtn").style.display = "block";
   document.getElementById("resetBtn").style.display = "block";
