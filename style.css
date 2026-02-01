@@ -332,26 +332,26 @@ button:disabled {
   box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
 }
 
+
 .score { text-align: center; border-color: var(--color-primary); }
 .score h2 { color: var(--color-primary); }
-/* Legend - Matching Dashboard Theme */
+
 .legend {
-  display: flex; /* Changed from inline-block */
+  display: flex; 
   justify-content: center;
   align-items: center;
   gap: 20px;
   flex-wrap: wrap;
   
-  margin: 30px auto; /* Centered with vertical spacing */
+  margin: 30px auto; 
   padding: 12px 24px;
   
-  /* Solid Panel Style matching Questions */
   background: var(--color-card-bg);
   backdrop-filter: none;
   border: 1px solid #333;
-  border-radius: var(--border-radius-main); /* Squarish - matching cards */
+  border-radius: var(--border-radius-main); 
   
-  width: 100%; /* Full width like questions */
+  width: 100%; 
   max-width: 100%;
   box-shadow: var(--shadow-panel);
 }
@@ -362,14 +362,9 @@ button:disabled {
     gap: 6px;
     font-size: 0.9rem;
     font-weight: 500;
-    color: var(--color-text-secondary); /* Default text color */
+    color: var(--color-text-secondary); 
 }
 
-/* Optional: Make the dots explicitly colored spans if structure allows, 
-   but current HTML uses inline styles for color. 
-   Let's augment with a small indicator class if needed, 
-   but the inline styles will color the text or dot. 
-   We'll let the inline color handle the highlight. */
 
 .progress-container {
     background: #222 !important;
@@ -380,20 +375,19 @@ button:disabled {
     box-shadow: var(--glow-primary);
 }
 
-/* Study Mode - Reusing Quiz Styles for consistency */
+
 .study-question {
-  /* Inherit from .question manually or just use the same class in HTML */
   margin-bottom: 30px;
   padding: 25px;
   border-radius: var(--border-radius-main);
-  background-color: var(--color-card-bg); /* Use Card BG like Quiz */
+  background-color: var(--color-card-bg); 
   border: 1px solid #333;
   box-shadow: var(--shadow-panel);
   position: relative;
 }
 
 .study-question h4 {
-  font-size: 1.35rem; /* Match Question h3 */
+  font-size: 1.35rem; 
   line-height: 1.5;
   margin-bottom: 25px;
   font-weight: 400;
@@ -406,36 +400,36 @@ button:disabled {
   padding-left: 0;
 }
 
-/* Base study answer style - looks like an option */
+
 .study-answer {
   display: flex;
   align-items: flex-start;
   gap: 16px;
   margin-bottom: 10px;
   padding: 16px 20px;
-  background: rgba(255, 255, 255, 0.03); /* Option base */
+  background: rgba(255, 255, 255, 0.03); 
   border-radius: var(--border-radius-small);
   border: 1px solid transparent;
   width: 100%;
-  color: var(--color-text-primary); /* Ensure white text */
+  color: var(--color-text-primary); 
   font-size: 1rem;
 }
 
-/* Correct Answer Styling */
+
 .study-answer.correct {
   background: rgba(74, 222, 128, 0.15); 
   border-color: var(--color-correct-border);
-  color: #ffffff; /* Bright white text inside green box for max contrast */
+  color: #ffffff; 
   font-weight: 600;
   box-shadow: 0 0 10px rgba(74, 222, 128, 0.1);
 }
 
-/* Incorrect (non-answer) Styling - Better Visibility */
+
 .study-answer.incorrect2 {
     color: var(--color-text-secondary);
-    opacity: 1; /* Removed opacity/dimming for readability */
+    opacity: 1; 
     background: transparent;
-    border: 1px solid rgba(255,255,255,0.05); /* Subtle border instead of opacity */
+    border: 1px solid rgba(255,255,255,0.05); 
 }
 
 
