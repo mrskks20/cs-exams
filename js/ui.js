@@ -129,6 +129,7 @@ function addOptionClickHandlers() {
     });
 
     option.addEventListener("click", (e) => {
+      if (cb.disabled) return;
       if (e.target !== cb && e.target.tagName !== "LABEL") {
          cb.checked = !cb.checked;
          cb.dispatchEvent(new Event("change"));
