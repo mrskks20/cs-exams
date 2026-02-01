@@ -90,15 +90,21 @@ function selectMode(mode) {
 
 function prepareQuiz() {
   document.getElementById("quiz-info").style.display = "block";
-  document.getElementById("controls").style.display = "block";
+  document.getElementById("controls").style.display = "flex";
   document.getElementById("drawNextBtn").style.display = "none";
+  
+  if (currentMode === "study") {
+    UI.renderStudyMode(currentQuestions, currentFile.file);
+  } else {
+    UI.renderQuizMode(currentQuestions);
+  }
+  
+  document.getElementById("checkBtn").style.display = "block";
+  document.getElementById("resetBtn").style.display = "block";
 
   const title = document.getElementById("quiz-title");
   const description = document.getElementById("quiz-description");
   const stats = document.getElementById("quiz-stats");
-
-  document.getElementById("checkBtn").style.display = "inline-block";
-  document.getElementById("resetBtn").style.display = "inline-block";
 
   switch (currentMode) {
     case "study":
@@ -212,11 +218,10 @@ function checkAnswers() {
 
   document.getElementById("legend").style.display = "flex";
   
-  // Hide Check button as it's useless now (inputs disabled)
   document.getElementById("checkBtn").style.display = "none";
 
   if (currentMode === "random5") {
-    document.getElementById("drawNextBtn").style.display = "inline-block";
+    document.getElementById("drawNextBtn").style.display = "block";
   }
 }
 
@@ -257,8 +262,7 @@ function drawNextRandomQuestions() {
   document.getElementById("legend").style.display = "none";
   
   document.getElementById("drawNextBtn").style.display = "none";
-  // Show Check button again for new questions
-  document.getElementById("checkBtn").style.display = "inline-block";
+  document.getElementById("checkBtn").style.display = "block";
   document.getElementById("checkBtn").disabled = false;
   
   isChecked = false;
@@ -289,8 +293,7 @@ function resetQuiz() {
     checkbox.parentElement.classList.remove("correct", "incorrect", "missed");
   });
   
-  // Show Check button again
-  document.getElementById("checkBtn").style.display = "inline-block";
+  document.getElementById("checkBtn").style.display = "block";
   document.getElementById("checkBtn").disabled = false;
   
   isChecked = false;

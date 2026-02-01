@@ -7,7 +7,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- KaTeX -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
@@ -21,18 +20,18 @@
         <div id="loading" class="loading"><p>🔄 Inicjalizacja platformy...</p></div>
         <div id="error-container"></div>
 
-        <div id="file-selector" class="file-selector" style="display: none;">
-            <div id="file-grid" class="file-grid" style="margin-top: 20px;"></div>
+        <div id="file-selector" class="file-selector hidden">
+            <div id="file-grid" class="file-grid"></div>
         </div>
 
-        <div class="mode-selector" id="mode-selector" style="display: none;">
+        <div class="mode-selector hidden" id="mode-selector">
             <h3>Wybierz Tryb</h3>
             
-            <div class="progress-section" style="margin-bottom: 20px; padding: 0 10px;">
-                <div class="progress-container" style="background: rgba(255, 255, 255, 0.1); border-radius: 10px; height: 10px; width: 100%; overflow: hidden;">
-                    <div id="global-progress-bar" style="background: linear-gradient(90deg, #4A90E2, #50E3C2); width: 0%; height: 100%; transition: width 0.5s ease;"></div>
+            <div class="progress-section">
+                <div class="progress-container">
+                    <div id="global-progress-bar"></div>
                 </div>
-                <p id="global-progress-text" style="text-align: center; margin-top: 5px; font-size: 0.9rem; color: var(--color-text-secondary);">Postęp: 0%</p>
+                <p id="global-progress-text">Postęp: 0%</p>
             </div>
 
             <div class="mode-buttons">
@@ -47,9 +46,9 @@
                         <label for="questionCount">Liczba pytań:</label>
                         <input type="number" id="questionCount" min="1" max="50" value="5">
                     </div>
-                    <div class="input-group" onclick="event.stopPropagation()" style="margin-top: 5px; flex-direction: row; align-items: center; justify-content: flex-start;">
-                         <input type="checkbox" id="excludeLearned" checked style="width: auto; margin-right: 5px;">
-                         <label for="excludeLearned" style="margin-bottom: 0; cursor: pointer;">Pomiń nauczone</label>
+                    <div class="input-group checkbox-group" onclick="event.stopPropagation()">
+                         <input type="checkbox" id="excludeLearned" checked>
+                         <label for="excludeLearned">Pomiń nauczone</label>
                     </div>
                 </div>
                 <div class="mode-btn" data-mode="range">
@@ -69,26 +68,26 @@
             </div>
         </div>
 
-        <div id="quiz-info" class="quiz-info" style="display: none;">
+        <div id="quiz-info" class="quiz-info hidden">
             <h2 id="quiz-title">Quiz</h2>
             <p id="quiz-description">Opis quizu</p>
             <div id="quiz-stats"></div>
         </div>
 
-        <div class="controls" id="controls" style="display: none;">
+        <div class="controls hidden" id="controls">
             <button id="checkBtn">Sprawdź Wyniki</button>
-            <button id="drawNextBtn" style="display: none;">Losuj kolejne</button>
+            <button id="drawNextBtn" class="hidden">Losuj kolejne</button>
             <button id="resetBtn">Resetuj</button>
             <button id="backBtn">Menu</button>
         </div>
 
         <div id="quiz-content"></div>
 
-        <div class="legend" id="legend" style="display: none;">
-            <span style="color: var(--color-text-secondary); margin-right: 10px;">Legenda:</span>
-            <span style="color: var(--color-correct-text)"><span style="font-size: 1.2em">●</span> Prawidłowa</span>
-            <span style="color: var(--color-missed-text)"><span style="font-size: 1.2em">●</span> Pominięta</span>
-            <span style="color: var(--color-incorrect-text)"><span style="font-size: 1.2em">●</span> Błędna</span>
+        <div class="legend hidden" id="legend">
+            <span class="legend-label">Legenda:</span>
+            <span class="legend-item correct-color"><span class="legend-dot">●</span> Prawidłowa</span>
+            <span class="legend-item missed-color"><span class="legend-dot">●</span> Pominięta</span>
+            <span class="legend-item incorrect-color"><span class="legend-dot">●</span> Błędna</span>
         </div>
 
         <div id="results"></div>

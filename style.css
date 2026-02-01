@@ -71,6 +71,68 @@ p, small { color: var(--color-text-secondary); }
   margin: 0 auto;
 }
 
+
+
+.file-grid {
+  margin-top: 20px;
+}
+
+.progress-section {
+  margin-bottom: 20px;
+  padding: 0 10px;
+}
+
+.checkbox-group {
+  margin-top: 5px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: auto;
+  margin-right: 5px;
+}
+
+.checkbox-group label {
+  margin-bottom: 0;
+  cursor: pointer;
+}
+
+#global-progress-text {
+  text-align: center;
+  margin-top: 5px;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+.legend-label {
+  color: var(--color-text-secondary);
+  margin-right: 10px;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legend-dot {
+  font-size: 1.2em;
+}
+
+.correct-color {
+  color: var(--color-correct-text);
+}
+
+.missed-color {
+  color: var(--color-missed-text);
+}
+
+.incorrect-color {
+  color: var(--color-incorrect-text);
+}
+
 .file-card, .mode-btn, .quiz-info, .question, .score, .controls {
   background: var(--color-card-bg);
   border: 1px solid #333;
@@ -246,65 +308,68 @@ p, small { color: var(--color-text-secondary); }
 @media (max-width: 600px) {
     .controls {
         width: 95%;
-        max-width: 100%; 
-        border-radius: 16px; 
-        padding: 8px 8px; 
-        gap: 6px; 
+        max-width: 95%; 
+        border-radius: 16px;
+        padding: 10px;
+        gap: 8px;
         
-        margin: 10px auto;
-        left: 0;
-        right: 0;
-        transform: none;
-        top: 15px; 
+        margin: 15px auto 20px auto;
         
-        display: grid;
-        grid-auto-flow: column;
-        grid-auto-columns: 1fr; 
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: center;
         align-items: center;
     }
     
     .controls button {
-        width: auto; 
+        flex: 1 1 0px;
         min-width: 0; 
+        max-width: none;
         
         height: auto;
-        min-height: 52px; 
-        padding: 4px 2px;
+        min-height: 48px;
+        padding: 8px 4px;
         
         display: flex;
         align-items: center;
         justify-content: center;
         
-        border-radius: 12px; 
+        border-radius: 12px;
         
-        font-size: 0.9rem; 
+        font-size: 0.85rem; 
         font-weight: 700;
-        line-height: 1.1;
+        line-height: 1.2;
         
         white-space: normal; 
         word-break: break-word;
         text-align: center;
     }
     
+    .controls button:only-child {
+        flex: 0 1 auto;
+        min-width: 100px;
+        max-width: 200px;
+    }
+    
     /* Specific tweak for long text like "Losuj kolejne" */
     #drawNextBtn {
-       font-size: 0.8rem; 
+       font-size: 0.75rem; 
     }
 }
 
 button {
   background: #252525;
   color: var(--color-text-primary);
-  border: 1px solid rgba(255,255,255,0.05); /* Subtle border */
+  border: 1px solid rgba(255,255,255,0.05);
   padding: 10px 20px;
-  border-radius: 99px; /* Pill buttons */
+  border-radius: 99px;
   cursor: pointer;
   font-weight: 600;
   font-size: 0.9rem;
   transition: all var(--transition-speed);
   min-width: 100px;
   text-align: center;
-  flex: 1;
   white-space: nowrap;
 }
 
@@ -362,7 +427,6 @@ button:disabled {
     gap: 6px;
     font-size: 0.9rem;
     font-weight: 500;
-    color: var(--color-text-secondary); 
 }
 
 
@@ -460,3 +524,12 @@ button:disabled {
 .file-card:nth-child(4) { animation-delay: 0.25s; }
 .file-card:nth-child(5) { animation-delay: 0.3s; }
 .file-card:nth-child(n+6) { animation-delay: 0.35s; }
+
+.hidden,
+.controls.hidden,
+.legend.hidden,
+.quiz-info.hidden,
+.file-selector.hidden,
+.mode-selector.hidden {
+  display: none;
+}
