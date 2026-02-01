@@ -29,6 +29,14 @@
 
         <div id="mode-selector" class="mode-selector" style="display: none;">
             <h3>Wybierz Tryb</h3>
+            
+            <div class="progress-section" style="margin-bottom: 20px; padding: 0 10px;">
+                <div class="progress-container" style="background: rgba(255, 255, 255, 0.1); border-radius: 10px; height: 20px; width: 100%; overflow: hidden;">
+                    <div id="global-progress-bar" style="background: linear-gradient(90deg, #4A90E2, #50E3C2); width: 0%; height: 100%; transition: width 0.5s ease;"></div>
+                </div>
+                <p id="global-progress-text" style="text-align: center; margin-top: 5px; font-size: 0.9rem; color: var(--color-text-secondary);">Postęp: 0%</p>
+            </div>
+
             <div class="mode-buttons">
                 <div class="mode-btn" data-mode="study">
                     <strong>💡 Tryb Nauki</strong><br>
@@ -40,6 +48,10 @@
                     <div class="input-group" onclick="event.stopPropagation()">
                         <label for="questionCount">Liczba pytań:</label>
                         <input type="number" id="questionCount" min="1" max="50" value="5">
+                    </div>
+                    <div class="input-group" onclick="event.stopPropagation()" style="margin-top: 5px; flex-direction: row; align-items: center; justify-content: center;">
+                         <input type="checkbox" id="excludeLearned" checked style="width: auto; margin-right: 5px;">
+                         <label for="excludeLearned" style="margin-bottom: 0; cursor: pointer;">Pomiń nauczone</label>
                     </div>
                 </div>
                 <div class="mode-btn" data-mode="range">
@@ -66,10 +78,10 @@
         </div>
 
         <div class="controls" id="controls" style="display: none;">
-            <button onclick="checkAnswers()" id="checkBtn">📋 Sprawdź Wyniki</button>
-            <button onclick="drawNextRandomQuestions()" id="drawNextBtn" style="display: none;">🎲 Losuj kolejne</button>
-            <button onclick="resetQuiz()" id="resetBtn">🔄 Resetuj</button>
-            <button onclick="backToMenu()" id="backBtn">🏠 Menu</button>
+            <button id="checkBtn">📋 Sprawdź Wyniki</button>
+            <button id="drawNextBtn" style="display: none;">🎲 Losuj kolejne</button>
+            <button id="resetBtn">🔄 Resetuj</button>
+            <button id="backBtn">🏠 Menu</button>
             <button onclick="scrollToTop()">⬆️</button>
             <button onclick="scrollToBottom()">⬇️</button>
         </div>
@@ -86,6 +98,6 @@
         <div id="results"></div>
     </div>
 
-    <script src="script.js"></script>
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>

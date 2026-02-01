@@ -1,9 +1,35 @@
-let availableFiles = [],
-  currentFile = null;
-let allQuestions = [],
-  currentQuestions = [];
-let currentMode = null,
-  isChecked = false;
+import { arraysEqual, scrollToTop, scrollToBottom } from "./utils.js";
+import { updateQuestionProgress, isQuestionLearned, loadProgress } from "./storage.js";
+import { shuffleAndMapQuestions, selectRandomQuestions, selectQuestionsInRange } from "./logic.js";
+import * as UI from "./ui.js";
+
+// Global State
+let availableFiles = [];
+let currentFile = null;
+let allQuestions = [];
+let currentQuestions = [];
+let currentMode = null;
+let isChecked = false;
+
+// Initialization
+document.addEventListener("DOMContentLoaded", () => {
+  loadConfig();
+  setupEventListeners();
+});
+
+function setupEventListeners() {
+    document.getElementById("checkBtn").addEventListener("click", checkAnswers);
+    document.getElementById("drawNextBtn").addEventListener("click", drawNextRandomQuestions);
+    document.getElementById("resetBtn").addEventListener("click", resetQuiz);
+    document.getElementById("backBtn").addEventListener("click", backToMenu);
+    
+    // Scroll buttons
+    document.querySelector("button[onclick='scrollToTop()']").onclick = null; // Clean inline
+    document.querySelector("button[onclick='scrollToTop()']").addEventListener("click", scrollToTop);
+    
+    document.querySelector("button[onclick='scrollToBottom()']").onclick = null; // Clean inline
+    document.querySelector("button[onclick='scrollToBottom()']").addEventListener("click", scrollToBottom);
+}
 
 async function loadConfig() {
   try {
@@ -16,53 +42,19 @@ async function loadConfig() {
       config.semesters.forEach((semester) => {
         availableFiles.push(...semester.files);
       });
-      renderFileSelector(config.semesters);
+      UI.renderFileSelector(config.semesters, selectFile);
     } else {
       availableFiles = config.files;
-      renderFileSelector([{ title: "Dostępne Kursy", files: availableFiles }]);
+      UI.renderFileSelector([{ title: "Dostępne Kursy", files: availableFiles }], selectFile);
     }
 
     document.getElementById("loading").style.display = "none";
     document.getElementById("file-selector").style.display = "block";
   } catch (error) {
-    showError(
+    UI.showError(
       `<strong>Błąd konfiguracji!</strong><br>Sprawdź plik 'config.json'.<br><small>${error.message}</small>`,
     );
   }
-}
-
-function renderFileSelector(semesters) {
-  const grid = document.getElementById("file-grid");
-  grid.innerHTML = "";
-
-  let globalIndex = 0;
-
-  semesters.forEach((semester) => {
-    const semesterHeader = document.createElement("div");
-    semesterHeader.className = "semester-header";
-    semesterHeader.innerHTML = `<h2>${semester.title}</h2>`;
-    semesterHeader.style.width = "100%";
-    semesterHeader.style.gridColumn = "1 / -1";
-    semesterHeader.style.marginTop = "20px";
-    semesterHeader.style.marginBottom = "10px";
-    semesterHeader.style.color = "var(--color-text-primary)";
-    semesterHeader.style.borderBottom = "1px solid var(--color-glass-border)";
-    semesterHeader.style.paddingBottom = "10px";
-    grid.appendChild(semesterHeader);
-
-    semester.files.forEach((file) => {
-      const card = document.createElement("div");
-      card.className = "file-card";
-      card.dataset.index = globalIndex;
-      card.innerHTML = `<h3>${file.name}</h3><p>${file.description}</p>`;
-
-      const capturedIndex = globalIndex;
-      card.addEventListener("click", () => selectFile(capturedIndex));
-
-      grid.appendChild(card);
-      globalIndex++;
-    });
-  });
 }
 
 async function selectFile(index) {
@@ -78,19 +70,24 @@ async function selectFile(index) {
     const response = await fetch(currentFile.file);
     if (!response.ok)
       throw new Error(`Nie można wczytać pliku: ${currentFile.file}`);
-    allQuestions = await response.json();
+    const rawQuestions = await response.json();
+    allQuestions = rawQuestions.map((q, index) => ({ ...q, _originalIndex: index }));
+
+
     document.getElementById("loading").style.display = "none";
     document.getElementById("mode-selector").style.display = "block";
+    updateGlobalProgressWithDOM();
 
     document
       .getElementById("mode-selector")
       .scrollIntoView({ behavior: "smooth" });
 
     document.querySelectorAll(".mode-btn").forEach((btn) => {
-      btn.onclick = () => selectMode(btn.dataset.mode);
+      // Cleaning old listeners not strictly needed if we replace elements, but good practice
+      btn.onclick = () => selectMode(btn.dataset.mode); 
     });
   } catch (error) {
-    showError(`Błąd wczytywania pliku: ${error.message}`);
+    UI.showError(`Błąd wczytywania pliku: ${error.message}`);
   }
 }
 
@@ -121,17 +118,27 @@ function prepareQuiz() {
       currentQuestions = [...allQuestions];
       document.getElementById("checkBtn").style.display = "none";
       document.getElementById("resetBtn").style.display = "none";
-      renderStudyMode();
+      UI.renderStudyMode(currentQuestions, currentFile.file);
       break;
 
     case "random5":
       const countInput = document.getElementById("questionCount");
       const questionCount = parseInt(countInput.value) || 5;
+      const excludeLearned = document.getElementById("excludeLearned").checked;
+      
       title.textContent = `🎲 ${currentFile.name} - Szybki Test`;
       description.textContent = `Wylosowano ${questionCount} pytań z pełnej bazy. Sprawdź swoją wiedzę!`;
-      selectRandomQuestions(questionCount);
-      currentQuestions = shuffleAndMapQuestions(currentQuestions);
-      renderQuizMode();
+      
+      const selection = selectRandomQuestions(allQuestions, questionCount, excludeLearned, currentFile.file);
+      if (selection.empty) {
+           alert("Gratulacje! Wszystkie pytania w tym zestawie zostały uznane za nauczone. Losuję z pełnej puli.");
+           const fallback = selectRandomQuestions(allQuestions, questionCount, false, currentFile.file);
+           currentQuestions = shuffleAndMapQuestions(fallback.questions);
+      } else {
+           currentQuestions = shuffleAndMapQuestions(selection.questions);
+      }
+      
+      UI.renderQuizMode(currentQuestions);
       break;
 
     case "range":
@@ -141,16 +148,16 @@ function prepareQuiz() {
       const rangeEnd = Math.min(allQuestions.length, parseInt(endInput.value) || allQuestions.length);
       
       if (rangeStart > rangeEnd || rangeStart > allQuestions.length) {
-        showError("❌ Błąd: Podaj prawidłowy zakres pytań!");
+        UI.showError("❌ Błąd: Podaj prawidłowy zakres pytań!");
         document.getElementById("mode-selector").style.display = "block";
         return;
       }
       
       title.textContent = `📍 ${currentFile.name} - Test z Zakresu`;
       description.textContent = `Pytania od ${rangeStart} do ${rangeEnd}. Razem ${rangeEnd - rangeStart + 1} pytań. Powodzenia!`;
-      selectQuestionsInRange(rangeStart - 1, rangeEnd - 1);
-      currentQuestions = shuffleAndMapQuestions(currentQuestions);
-      renderQuizMode();
+      const rangeQuestions = selectQuestionsInRange(allQuestions, rangeStart - 1, rangeEnd - 1);
+      currentQuestions = shuffleAndMapQuestions(rangeQuestions);
+      UI.renderQuizMode(currentQuestions);
       break;
 
     case "fullquiz":
@@ -158,78 +165,17 @@ function prepareQuiz() {
       description.textContent =
         "Wszystkie pytania w trybie quizu. Pokaż co potrafisz!";
       currentQuestions = shuffleAndMapQuestions([...allQuestions]);
-      renderQuizMode();
+      UI.renderQuizMode(currentQuestions);
       break;
   }
-  stats.innerHTML = `<strong>📊 Statystyki:</strong> ${currentQuestions.length} pytań | ${getModeDisplayName(currentMode)}`;
-}
-
-function renderStudyMode() {
-  const quizContent = document.getElementById("quiz-content");
-  quizContent.innerHTML = "";
-
-  currentQuestions.forEach((q, index) => {
-    const questionDiv = document.createElement("div");
-    questionDiv.className = "study-question";
-
-    const optionsHtml = q.options
-      .map((option, optIndex) => {
-        const isCorrect = q.correct.includes(optIndex);
-        const marker = isCorrect ? "✅" : "—";
-        const className = isCorrect ? "correct" : "incorrect2";
-
-        return `<div class="study-answer ${className}">${marker} ${option}</div>`;
-      })
-      .join("");
-
-    questionDiv.innerHTML = `
-            <h4>${index + 1}. ${q.question}</h4>
-            <div class="study-answers">
-                ${optionsHtml}
-            </div>
-        `;
-    quizContent.appendChild(questionDiv);
-  });
-  scrollToTop();
-  renderLatex();
-}
-
-function renderQuizMode() {
-  const quizContent = document.getElementById("quiz-content");
-  quizContent.innerHTML = "";
-
-  currentQuestions.forEach((q, index) => {
-    const questionDiv = document.createElement("div");
-    questionDiv.className = "question";
-
-    const optionsHtml = q.options
-      .map(
-        (option, optIndex) => `
-            <div class="option">
-                <input type="checkbox" id="q${index}_${optIndex}" data-question="${index}" data-answer="${optIndex}">
-                <label for="q${index}_${optIndex}">${option}</label>
-            </div>
-        `,
-      )
-      .join("");
-
-    questionDiv.innerHTML = `
-            <div class="question-number">Pytanie ${index + 1}/${currentQuestions.length}</div>
-            <h3>${q.question}</h3>
-            ${optionsHtml}
-        `;
-    quizContent.appendChild(questionDiv);
-  });
-
-  addOptionClickHandlers();
-  scrollToTop();
-  renderLatex();
+  stats.innerHTML = `<strong>📊 Statystyki:</strong> ${currentQuestions.length} pytań | ${UI.getModeDisplayName(currentMode)}`;
 }
 
 function checkAnswers() {
   if (currentQuestions.length === 0 || currentMode === "study") return;
 
   let correctQuestions = 0;
+  let newlyLearnedCount = 0;
 
   currentQuestions.forEach((question, qIndex) => {
     const checkboxes = document.querySelectorAll(
@@ -239,8 +185,20 @@ function checkAnswers() {
       .filter((cb) => cb.checked)
       .map((cb) => parseInt(cb.dataset.answer));
 
-    if (arraysEqual(selectedAnswers.sort(), question.correct.sort()))
+    if (arraysEqual(selectedAnswers.sort(), question.correct.sort())) {
       correctQuestions++;
+      const wasLearned = isQuestionLearned(currentFile.file, question._originalIndex);
+      updateQuestionProgress(currentFile.file, question._originalIndex, true);
+      const isNowLearned = isQuestionLearned(currentFile.file, question._originalIndex);
+      
+      if (!wasLearned && isNowLearned) {
+        newlyLearnedCount++;
+      }
+    } else {
+
+      updateQuestionProgress(currentFile.file, question._originalIndex, false);
+    }
+
 
     checkboxes.forEach((checkbox) => {
       const answerIndex = parseInt(checkbox.dataset.answer);
@@ -259,7 +217,9 @@ function checkAnswers() {
     .querySelectorAll('input[type="checkbox"]')
     .forEach((cb) => (cb.disabled = true));
   isChecked = true;
-  showResults(correctQuestions);
+  
+  processResults(correctQuestions, newlyLearnedCount);
+
   document.getElementById("legend").style.display = "block";
 
   if (currentMode === "random5") {
@@ -267,8 +227,8 @@ function checkAnswers() {
   }
 }
 
-function showResults(correctQuestions) {
-  const totalQuestions = currentQuestions.length;
+function processResults(correctQuestions, newlyLearnedCount) {
+    const totalQuestions = currentQuestions.length;
   const percentage = Math.round((correctQuestions / totalQuestions) * 100);
 
   let grade, gradeColor, encouragement;
@@ -293,16 +253,8 @@ function showResults(correctQuestions) {
     gradeColor = "var(--color-incorrect)";
     encouragement = "Nie poddawaj się! 🚀";
   }
-
-  document.getElementById("results").innerHTML = `
-        <div class="score">
-            <h2 style="color: ${gradeColor}; font-size: 2rem;">${grade}</h2>
-            <p style="font-size: 2.5rem; margin: 10px 0;"><strong>${correctQuestions}/${totalQuestions} (${percentage}%)</strong></p>
-            <p>${encouragement}</p>
-        </div>`;
-  document
-    .getElementById("results")
-    .scrollIntoView({ behavior: "smooth", block: "center" });
+  
+  UI.showResults(correctQuestions, totalQuestions, percentage, grade, gradeColor, encouragement, newlyLearnedCount);
 }
 
 function drawNextRandomQuestions() {
@@ -316,13 +268,21 @@ function drawNextRandomQuestions() {
 
   const countInput = document.getElementById("questionCount");
   const questionCount = parseInt(countInput.value) || 5;
+  const excludeLearned = document.getElementById("excludeLearned").checked;
 
   document.getElementById("quiz-description").textContent =
     `Oto kolejny zestaw ${questionCount} pytań. Powodzenia!`;
 
-  selectRandomQuestions(questionCount);
-  currentQuestions = shuffleAndMapQuestions(currentQuestions);
-  renderQuizMode();
+  const selection = selectRandomQuestions(allQuestions, questionCount, excludeLearned, currentFile.file);
+  if (selection.empty) {
+       alert("Gratulacje! Wszystkie pytania w tym zestawie zostały uznane za nauczone. Losuję z pełnej puli.");
+       const fallback = selectRandomQuestions(allQuestions, questionCount, false, currentFile.file);
+       currentQuestions = shuffleAndMapQuestions(fallback.questions);
+  } else {
+       currentQuestions = shuffleAndMapQuestions(selection.questions);
+  }
+  
+  UI.renderQuizMode(currentQuestions);
 }
 
 function resetQuiz() {
@@ -350,7 +310,9 @@ function backToMenu() {
     (id) => (document.getElementById(id).style.display = "block"),
   );
   document.getElementById("mode-selector").style.display = "none";
+  if (currentFile) updateGlobalProgressWithDOM();
   currentMode = null;
+
   isChecked = false;
   document
     .querySelectorAll(".file-card.selected")
@@ -358,97 +320,18 @@ function backToMenu() {
   scrollToTop();
 }
 
-const secureShuffle = (array) => {
-  for (let i = array.length - 1; i > 0; i--) {
-    const randomBuffer = new Uint32Array(1);
-    window.crypto.getRandomValues(randomBuffer);
-    const j = randomBuffer[0] % (i + 1);
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-};
-
-function selectRandomQuestions(count) {
-  const shuffled = secureShuffle([...allQuestions]);
-  currentQuestions = shuffled.slice(0, Math.min(count, allQuestions.length));
-}
-
-function selectQuestionsInRange(startIndex, endIndex) {
-  currentQuestions = allQuestions.slice(startIndex, endIndex + 1);
-}
-
-function addOptionClickHandlers() {
-  document.querySelectorAll(".option").forEach((option) => {
-    option.addEventListener("click", (e) => {
-      if (e.target.type !== "checkbox") {
-        const cb = option.querySelector('input[type="checkbox"]');
-        if (cb && !cb.disabled) cb.checked = !cb.checked;
-      }
-    });
-  });
-}
-
-function getModeDisplayName(mode) {
-  const names = {
-    study: "Tryb Nauki",
-    random5: "Szybki Test",
-    range: "Test z Zakresu",
-    fullquiz: "Pełny Egzamin",
-  };
-  return names[mode] || mode;
-}
-
-function showError(message) {
-  document.getElementById("loading").style.display = "none";
-  document.getElementById("error-container").innerHTML =
-    `<div class="error-message">${message}</div>`;
-}
-
-function scrollToTop() {
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}
-function scrollToBottom() {
-  window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
-}
-function arraysEqual(a, b) {
-  return a.length === b.length && a.every((val, i) => val === b[i]);
-}
-
-function shuffleAndMapQuestions(questions) {
-  return questions.map((q) => {
-    const indices = q.options.map((_, i) => i);
-
-    for (let i = indices.length - 1; i > 0; i--) {
-      const randomBuffer = new Uint32Array(1);
-      window.crypto.getRandomValues(randomBuffer);
-      const j = randomBuffer[0] % (i + 1);
-      [indices[i], indices[j]] = [indices[j], indices[i]];
-    }
-
-    const newOptions = indices.map((i) => q.options[i]);
-
-    const newCorrect = q.correct.map((oldIndex) => indices.indexOf(oldIndex));
-
-    return {
-      ...q,
-      options: newOptions,
-      correct: newCorrect,
-    };
-  });
-}
-
-function renderLatex() {
-  if (typeof renderMathInElement === "function") {
-    renderMathInElement(document.getElementById("quiz-content"), {
-      delimiters: [
-        { left: "$$", right: "$$", display: true },
-        { left: "$", right: "$", display: false },
-        { left: "\\(", right: "\\)", display: false },
-        { left: "\\[", right: "\\]", display: true },
-      ],
-      throwOnError: false,
-    });
+function updateGlobalProgressWithDOM() {
+  if (!allQuestions || allQuestions.length === 0) return;
+  
+  const learnedCount = allQuestions.filter(q => isQuestionLearned(currentFile.file, q._originalIndex)).length;
+  const total = allQuestions.length;
+  const percentage = Math.round((learnedCount / total) * 100);
+  
+  const bar = document.getElementById("global-progress-bar");
+  const text = document.getElementById("global-progress-text");
+  
+  if (bar && text) {
+    bar.style.width = `${percentage}%`;
+    text.textContent = `Postęp: ${learnedCount}/${total} opanowanych (${percentage}%)`;
   }
 }
-
-document.addEventListener("DOMContentLoaded", loadConfig);
