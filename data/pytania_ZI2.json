@@ -485,9 +485,9 @@
       "Przykładami baz klucz-wartość są MongoDB i CouchDB."
     ],
     "correct": [
-      0,
       1,
-      2
+      2,
+      4
     ]
   },
   {
